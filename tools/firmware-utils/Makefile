@@ -87,6 +87,7 @@ define Host/Compile
 	$(call cc,dns313-header, -Wall)
 	$(call cc,mksercommfw, -Wall)
 	$(call cc,nec-enc, -Wall --std=gnu99)
+	$(call cc,cvimg)
 endef
 
 define Host/Install

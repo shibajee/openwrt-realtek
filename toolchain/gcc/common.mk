@@ -161,6 +161,10 @@ ifneq ($(GCC_ARCH),)
   GCC_CONFIGURE+= --with-arch=$(GCC_ARCH)
 endif
 
+ifneq ($(CONFIG_TARGET_realtek_lexra),)
+  GCC_CONFIGURE+= --with-arch=lexra
+endif
+
 ifeq ($(CONFIG_arm),y)
   GCC_CONFIGURE+= \
 	--with-cpu=$(word 1, $(subst +," ,$(CONFIG_CPU_TYPE)))

@@ -1,0 +1,190 @@
+--- a/ldso/ldso/mips/dl-startup.h
++++ b/ldso/ldso/mips/dl-startup.h
+@@ -85,8 +85,14 @@
+     "	dla	$2, _dl_fini\n"
+ #else	/* O32 || N32 */
+     "	lw	$2, _dl_skip_args\n"
++#ifndef __mlexra
+     "	beq	$2, $0, 1f\n"
+     "	lw	$4, 0($29)\n"
++#else	/* __mlexra */
++    "	lw	$4, 0($29)\n"
++    "	beq	$2, $0, 1f\n"
++    "	nop\n"
++#endif	/* !__mlexra */
+     "	subu	$4, $2\n"
+     "	sll	$2, 2\n"
+     "	addu	$29, $2\n"
+--- a/ldso/ldso/mips/dl-sysdep.h
++++ b/ldso/ldso/mips/dl-sysdep.h
+@@ -220,6 +220,9 @@
+ 	__asm__ ("        .set noreorder\n"
+ # if !defined __mips_isa_rev || __mips_isa_rev < 6
+ 	     "        " STRINGXP (PTR_LA) " %0, 0f\n"
++#ifdef __mlexra
++	     "        nop\n"
++#endif /* __mlexra */
+ 	     "        bltzal $0, 0f\n"
+ 	     "        nop\n"
+ 	     "0:      " STRINGXP (PTR_SUBU) " %0, $31, %0\n"
+--- a/libc/string/mips/memcpy.S
++++ b/libc/string/mips/memcpy.S
+@@ -319,10 +319,19 @@
+ 	beq	a3,zero,L(aligned)	/* if a3=0, it is already aligned */
+ 	PTR_SUBU a2,a2,a3		/* a2 is the remining bytes count */
+ 
++#ifndef __mlexra
+ 	C_LDHI	t8,0(a1)
+ 	PTR_ADDU a1,a1,a3
+ 	C_STHI	t8,0(a0)
+ 	PTR_ADDU a0,a0,a3
++#else /* __mlexra */
++1:	lbu	t8, 0(a1)
++	PTR_SUBU a3, 1
++	sb	t8, 0(a0)
++	PTR_ADDIU a1, 1
++	bnez	a3, 1b
++	PTR_ADDIU a0, 1
++#endif /* __mlexra */
+ 
+ #else /* R6_CODE */
+ 
+@@ -614,6 +623,7 @@
+ 	move	a2,t8
+ 
+ #ifndef R6_CODE
++# ifndef __mlexra
+ /*
+  * UNALIGNED case, got here with a3 = "negu a0"
+  * This code is nearly identical to the aligned code above
+@@ -804,6 +814,18 @@
+ 
+ 	j	ra
+ 	nop
++# else /* __mlexra */
++L(unaligned):
++	lbu	v1,  0(a1)
++	PTR_SUBU a2,  a2, 1
++	sb	v1,  0(a0)
++	PTR_ADDIU a1,  a1, 1
++	bnez	a2,  L(unaligned)
++	PTR_ADDIU a0,  a0, 1
++
++	j	ra
++	nop
++# endif /* !__mlexra */
+ 
+ #else /* R6_CODE */
+ 
+--- a/libc/string/mips/memset.S
++++ b/libc/string/mips/memset.S
+@@ -253,8 +253,15 @@
+ 	andi	t2,a3,(NSIZE-1)		/* word-unaligned address?          */
+ 	beq	t2,zero,L(aligned)	/* t2 is the unalignment count      */
+ 	PTR_SUBU a2,a2,t2
++#ifndef __mlexra
+ 	C_STHI	a1,0(a0)
+ 	PTR_ADDU a0,a0,t2
++#else /* __mlexra */
++	PTR_ADDU t1, a0, t2
++1:	PTR_ADDIU a0, 1
++	bne	a0, t1, 1b
++	sb	a1, -1(a0)
++#endif /* !__mlexra */
+ #else /* R6_CODE */
+ 	andi	t2,a0,(NSIZE-1)
+ 	lapc	t9,L(atable)
+--- a/libc/sysdeps/linux/mips/clone.S
++++ b/libc/sysdeps/linux/mips/clone.S
+@@ -124,6 +124,9 @@
+ 	move		a0,v0
+ #ifdef __PIC__
+ 	PTR_LA		t9,_exit
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ 	jalr		t9
+ #else
+ 	jal		_exit
+--- a/libc/sysdeps/linux/mips/crt1.S
++++ b/libc/sysdeps/linux/mips/crt1.S
+@@ -105,6 +105,9 @@
+ #endif
+ 	PTR_LA $7, _init		/* init */
+ 	PTR_LA $8, _fini
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ #if _MIPS_SIM == _MIPS_SIM_ABI32
+ 	PTR_S $8, 16($29)		/* fini */
+ 	PTR_S $2, 20($29)		/* rtld_fini */
+--- a/libc/sysdeps/linux/mips/crtn.S
++++ b/libc/sysdeps/linux/mips/crtn.S
+@@ -13,7 +13,9 @@
+ 	.type	_init, @function
+ #NO_APP
+ 	lw	$31,28($sp)
+-	#nop
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ 	.set	noreorder
+ 	.set	nomacro
+ 	j	$31
+@@ -30,7 +32,9 @@
+ 	.type	_fini, @function
+ #NO_APP
+ 	lw	$31,28($sp)
+-	#nop
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ 	.set	noreorder
+ 	.set	nomacro
+ 	j	$31
+--- a/libc/sysdeps/linux/mips/makecontext.S
++++ b/libc/sysdeps/linux/mips/makecontext.S
+@@ -154,6 +154,9 @@
+ 	move	a0, s0
+ #ifdef __PIC__
+ 	PTR_LA	t9, JUMPTARGET (__setcontext)
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ 	jalr	t9
+ # if _MIPS_SIM == _ABIO32
+ 	move	gp, s1
+@@ -167,6 +170,9 @@
+ 	/* exit (a0) */
+ #ifdef __PIC__
+ 	PTR_LA	t9, HIDDEN_JUMPTARGET (exit)
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ 	jalr	t9
+ #else
+ 	jal	HIDDEN_JUMPTARGET (exit)
+--- a/libc/sysdeps/linux/mips/setjmp.S
++++ b/libc/sysdeps/linux/mips/setjmp.S
+@@ -50,6 +50,9 @@
+ #endif
+ #ifdef __PIC__
+ 	PTR_LA	t9, __sigsetjmp_aux
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ #if _MIPS_SIM != _MIPS_SIM_ABI32
+ 	.cpreturn
+ 	move 	a4, gp
+--- a/libc/sysdeps/linux/mips/syscall_error.S
++++ b/libc/sysdeps/linux/mips/syscall_error.S
+@@ -50,6 +50,9 @@
+ 
+ 	/* Store the error value.  */
+ 	REG_L	t0, V0OFF(sp)
++#ifdef __mlexra
++	nop
++#endif /* __mlexra */
+ 	sw	t0, 0(v0)
+ 
+ 	/* And just kick back a -1.  */

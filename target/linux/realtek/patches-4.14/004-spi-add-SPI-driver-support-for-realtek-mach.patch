@@ -1,0 +1,25 @@
+--- a/drivers/spi/Kconfig
++++ b/drivers/spi/Kconfig
+@@ -544,6 +544,12 @@
+ 	help
+ 	  SPI controller driver for the Mikrotik RB4xx series boards.
+ 
++config SPI_REALTEK
++	tristate "Realtek SoC SPI controller driver"
++	depends on REALTEK
++	help
++	  SPI controller driver for the Realtek SoCs.
++
+ config SPI_RSPI
+ 	tristate "Renesas RSPI/QSPI controller"
+ 	depends on SUPERH || ARCH_RENESAS || COMPILE_TEST
+--- a/drivers/spi/Makefile
++++ b/drivers/spi/Makefile
+@@ -80,6 +80,7 @@
+ obj-$(CONFIG_SPI_QUP)			+= spi-qup.o
+ obj-$(CONFIG_SPI_ROCKCHIP)		+= spi-rockchip.o
+ obj-$(CONFIG_SPI_RB4XX)			+= spi-rb4xx.o
++obj-$(CONFIG_SPI_REALTEK)		+= spi-realtek.o
+ obj-$(CONFIG_SPI_RSPI)			+= spi-rspi.o
+ obj-$(CONFIG_SPI_S3C24XX)		+= spi-s3c24xx-hw.o
+ spi-s3c24xx-hw-y			:= spi-s3c24xx.o

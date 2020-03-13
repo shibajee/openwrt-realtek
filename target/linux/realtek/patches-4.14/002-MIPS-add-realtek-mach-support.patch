@@ -1,0 +1,58 @@
+--- a/arch/mips/Kbuild.platforms
++++ b/arch/mips/Kbuild.platforms
+@@ -27,6 +27,7 @@
+ platforms += pnx833x
+ platforms += ralink
+ platforms += rb532
++platforms += realtek
+ platforms += sgi-ip22
+ platforms += sgi-ip27
+ platforms += sgi-ip32
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@ -1010,6 +1010,27 @@
+ 	help
+ 	  This option supports guest running under ????
+ 
++config REALTEK
++	bool "Realtek RLX based SoC support"
++	select BOOT_RAW
++	select DMA_NONCOHERENT
++	select IRQ_MIPS_CPU
++	select IRQ_DOMAIN
++	select HW_HAS_PCI
++	select MIPS_MACHINE
++	select HAVE_CLK
++	select COMMON_CLK
++	select CLKDEV_LOOKUP
++	select GENERIC_CSUM
++	select ARCH_REQUIRE_GPIOLIB
++	select SYS_HAS_CPU_R3000
++	select SYS_SUPPORTS_BIG_ENDIAN
++	select SYS_SUPPORTS_MIPS16
++	select SYS_SUPPORTS_32BIT_KERNEL
++	select SYS_HAS_EARLY_PRINTK
++	help
++	  Support for Realtek RLX SoC based boards
++
+ endchoice
+ 
+ source "arch/mips/alchemy/Kconfig"
+@@ -1027,6 +1048,7 @@
+ source "arch/mips/pistachio/Kconfig"
+ source "arch/mips/pmcs-msp71xx/Kconfig"
+ source "arch/mips/ralink/Kconfig"
++source "arch/mips/realtek/Kconfig"
+ source "arch/mips/sgi-ip27/Kconfig"
+ source "arch/mips/sibyte/Kconfig"
+ source "arch/mips/txx9/Kconfig"
+--- a/arch/mips/pci/Makefile
++++ b/arch/mips/pci/Makefile
+@@ -26,6 +26,7 @@
+ obj-$(CONFIG_SOC_AR71XX)	+= pci-ar71xx.o
+ obj-$(CONFIG_PCI_AR724X)	+= pci-ar724x.o
+ obj-$(CONFIG_MIPS_PCI_VIRTIO)	+= pci-virtio-guest.o
++obj-$(CONFIG_REALTEK)		+= pci-realtek.o
+ #
+ # These are still pretty much in the old state, watch, go blind.
+ #

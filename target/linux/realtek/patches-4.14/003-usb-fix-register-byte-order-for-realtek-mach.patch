@@ -1,0 +1,40 @@
+--- a/drivers/usb/host/ehci.h
++++ b/drivers/usb/host/ehci.h
+@@ -755,6 +755,8 @@
+ 	return ehci_big_endian_mmio(ehci) ?
+ 		readl_be(regs) :
+ 		readl(regs);
++#elif defined(CONFIG_REALTEK)
++	return __le32_to_cpu(readl(regs));
+ #else
+ 	return readl(regs);
+ #endif
+@@ -779,6 +781,8 @@
+ 	ehci_big_endian_mmio(ehci) ?
+ 		writel_be(val, regs) :
+ 		writel(val, regs);
++#elif defined(CONFIG_REALTEK)
++	writel(__le32_to_cpu(val), regs);
+ #else
+ 	if (ehci->imx28_write_fix)
+ 		imx28_ehci_writel(val, regs);
+--- a/drivers/usb/host/ohci.h
++++ b/drivers/usb/host/ohci.h
+@@ -565,6 +565,8 @@
+ 	return big_endian_mmio(ohci) ?
+ 		readl_be (regs) :
+ 		readl (regs);
++#elif defined(CONFIG_REALTEK)
++	return __le32_to_cpu(readl(regs));
+ #else
+ 	return readl (regs);
+ #endif
+@@ -577,6 +579,8 @@
+ 	big_endian_mmio(ohci) ?
+ 		writel_be (val, regs) :
+ 		writel (val, regs);
++#elif defined(CONFIG_REALTEK)
++	writel(__le32_to_cpu(val), regs);
+ #else
+ 		writel (val, regs);
+ #endif

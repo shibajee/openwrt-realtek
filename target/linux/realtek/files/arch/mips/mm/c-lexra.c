@@ -390,15 +390,7 @@ static void lexra_probe_cache(void)
 	lexra_has_wb_dcache = 0;
 
 	switch (current_cpu_type()) {
-	case CPU_LX4180:
-	case CPU_LX4189:
-	case CPU_LX4280:
-	case CPU_LX5180:
-	case CPU_LX5280:
-	case CPU_LX8000:
-		break;
-	case CPU_LX4380:
-	case CPU_LX8380:
+	case CPU_LX4181:
 		lexra_has_dcacheop = 1;
 		lexra_has_wb_dcache = 1;
 		break;

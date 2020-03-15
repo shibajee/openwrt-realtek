@@ -119,7 +119,7 @@ static int rtl865x_register_mdio(struct rtl865x *rsw)
 	rsw->mii_sw->read = rtl865x_mdio_read;
 	rsw->mii_sw->write = rtl865x_mdio_write;
 	rsw->mii_sw->phy_mask = RTL865X_MII_PHY_MASK;
-	rsw->mii_sw->irq = rsw->mii_irq;
+	memcpy(rsw->mii_sw->irq, rsw->mii_irq, sizeof(rsw->mii_irq));
 	rsw->mii_sw->priv = rsw;
 	rsw->mii_sw->parent = rsw->parent;
 	snprintf(rsw->mii_sw->id, MII_BUS_ID_SIZE, "rtl865x-mdio");

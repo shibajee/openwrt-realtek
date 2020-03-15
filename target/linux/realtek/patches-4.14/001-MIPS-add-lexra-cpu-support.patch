@@ -492,13 +492,13 @@
  	.endif
  
 -#ifdef CONFIG_CPU_MIPSR6
-+#if !defined(CONFIG_CPU_MIPSR6) && !defined(CONFIG_CPU_LEXRA)
++#if defined(CONFIG_CPU_MIPSR6) || defined(CONFIG_CPU_LEXRA)
  .Lbyte_fixup\@:
  	PTR_SUBU	a2, $0, t0
  	jr		ra
  	 PTR_ADDIU	a2, 1
 -#endif /* CONFIG_CPU_MIPSR6 */
-+#endif /* !CONFIG_CPU_MIPSR6 && !CONFIG_CPU_LEXRA */
++#endif /* CONFIG_CPU_MIPSR6 || CONFIG_CPU_LEXRA */
  
  .Lfirst_fixup\@:
  	jr	ra

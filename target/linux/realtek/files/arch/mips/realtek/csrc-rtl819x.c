@@ -58,7 +58,7 @@ static __init void rtl819x_tc1_init(void)
 		BUG();
 }
 
-static cycle_t rtl819x_tc1_count_read(struct clocksource *cs)
+static u64 rtl819x_tc1_count_read(struct clocksource *cs)
 {
 	return __raw_readl(realtek_tc_base + REALTEK_TC_REG_COUNT1) >> tc_data_shift;
 }

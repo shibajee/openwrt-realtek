@@ -28,7 +28,7 @@ static struct clk *__init realtek_add_sys_clkdev(
 	struct clk *clk;
 	int err;
 
-	clk = clk_register_fixed_rate(NULL, id, NULL, CLK_IS_ROOT, rate);
+	clk = clk_register_fixed_rate(NULL, id, NULL, 0, rate);
 	if (!clk)
 		panic("failed to allocate %s clock structure", id);
 

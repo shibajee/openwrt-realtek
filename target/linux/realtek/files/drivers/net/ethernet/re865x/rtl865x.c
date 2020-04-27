@@ -166,7 +166,7 @@ static void rtl865x_phy_page_reg_rmw(struct rtl865x *rsw, int addr, int page, in
 	mdiobus_write(rsw->mii_sw, addr, 31, 0);
 }
 
-static void rtl8196c_revb_fixup(struct rtl865x *rsw)
+static void rtl8196e_fixup(struct rtl865x *rsw)
 {
 	int i;
 	u16 val;
@@ -186,7 +186,7 @@ static void rtl8196c_revb_fixup(struct rtl865x *rsw)
 	/* 100M half duplex enhancement */
 	rtl865x_reg_rmw(rsw, RTL865X_SW_REG_MAC_CONFIG, RTL865X_SW_CF_RXIPG_MASK, 0x5);
 
-	/* fix the link down / link up issue when RTL8196c set to Auto-negotiation
+	/* fix the link down / link up issue when RTL8196e set to Auto-negotiation
 	    and SmartBit force to 100M Full-duplex */
 	rtl865x_reg_rmw(rsw, RTL865X_SW_REG_MAC_CONFIG,
 		RTL865X_SW_SELIPG_MASK << RTL865X_SW_SELIPG_SHIFT,
@@ -215,12 +215,12 @@ static void rtl8196c_revb_fixup(struct rtl865x *rsw)
 	}
 }
 
-static void rtl8196c_port_setup(struct rtl865x *rsw)
+static void rtl8196e_port_setup(struct rtl865x *rsw)
 {
 	int i;
 
-	if (soc_is_rtl8196c_rev_b())
-		rtl8196c_revb_fixup(rsw);
+	if (soc_is_rtl8196e())
+		rtl8196e_fixup(rsw);
 
 	for (i = 0; i < rsw->num_ports; i++)
 	{
@@ -441,8 +441,8 @@ static void rtl865x_reset(struct rtl865x *rsw)
 	/* reset mib counters */
 	rtl865x_reg_write(rsw, RTL865X_SW_REG_MIB_CONTROL, RTL865X_SW_ALL_PORT_COUNTER_RESTART);
 
-	if (soc_is_rtl8196c())
-		rtl8196c_port_setup(rsw);
+	if (soc_is_rtl8196e())
+		rtl8196e_port_setup(rsw);
 
 	/* enable broadcast packets to cpu port */
 	rtl865x_reg_rmw(rsw, RTL865X_SW_REG_FRAME_FORWARDING_CONFIG, 0,
@@ -776,7 +776,7 @@ int rtl865x_switch_probe(struct rtl865x *rsw)
 	int err;
 	int i;
 
-	if (soc_is_rtl8196c()) {
+	if (soc_is_rtl8196e()) {
 		rsw->num_ports = RTL865X_NUM_PHY_PORTS;
 	} else {
 		dev_err(rsw->parent, "unsupported soc for built-in switch\n");

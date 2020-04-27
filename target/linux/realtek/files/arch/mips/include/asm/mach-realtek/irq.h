@@ -9,7 +9,7 @@
 #define __ASM_MACH_REALTEK_IRQ_H
 
 #define MIPS_CPU_IRQ_BASE		0
-#define NR_IRQS				40
+#define NR_IRQS				128
 
 #define REALTEK_CPU_IRQ(_x)		(MIPS_CPU_IRQ_BASE + (_x))
 

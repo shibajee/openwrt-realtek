@@ -85,7 +85,7 @@ static void __init realtek_usb_register(struct platform_device *usb_dev, int irq
 	platform_device_register(usb_dev);
 }
 
-static void __init rtl8196c_ehci_wr(u32 reg, u32 val)
+static void __init rtl8196e_ehci_wr(u32 reg, u32 val)
 {
 	u32 reg_h = ((reg & 0xf0) >> 4) << 16;
 	u32 reg_l = (reg & 0x0f) << 16;
@@ -100,22 +100,22 @@ static void __init rtl8196c_ehci_wr(u32 reg, u32 val)
 	__raw_writel((0x00300000 | reg_h), (void __iomem *) (KSEG1ADDR(REALTEK_USB_EHCI_BASE) + 0xA4));
 }
 
-static void __init rtl8196c_usb_setup(void)
+static void __init rtl8196e_usb_setup(void)
 {
 	u32 val;
 
 	val = realtek_sys_read(REALTEK_SYS_REG_CLK_MANAGE);
-	val |= RTL8196C_SYS_CLK_USB_HOST_EN;
+	val |= RTL8196E_SYS_CLK_USB_HOST_EN;
 	realtek_sys_write(REALTEK_SYS_REG_CLK_MANAGE, val);
 
 	/* disable Host chirp J-K */
-	rtl8196c_ehci_wr(0xf4, 0xe3);
+	rtl8196e_ehci_wr(0xf4, 0xe3);
 	/* 8196C demo board: 0xE0:99, 0xE1:A8, 0xE2:98, 0xE3:C1,  0xE5:91 */
-	rtl8196c_ehci_wr(0xe0, 0x99);
-	rtl8196c_ehci_wr(0xe1, 0xa8);
-	rtl8196c_ehci_wr(0xe2, 0x98);
-	rtl8196c_ehci_wr(0xe3, 0xc1);
-	rtl8196c_ehci_wr(0xe5, 0x91);
+	rtl8196e_ehci_wr(0xe0, 0x99);
+	rtl8196e_ehci_wr(0xe1, 0xa8);
+	rtl8196e_ehci_wr(0xe2, 0x98);
+	rtl8196e_ehci_wr(0xe3, 0xc1);
+	rtl8196e_ehci_wr(0xe5, 0x91);
 
 	realtek_usb_register(&realtek_ohci_device, REALTEK_CPU_IRQ(4));
 	realtek_usb_register(&realtek_ehci_device, REALTEK_CPU_IRQ(4));
@@ -123,8 +123,8 @@ static void __init rtl8196c_usb_setup(void)
 
 void __init realtek_register_usb(void)
 {
-	if (soc_is_rtl8196c())
-		rtl8196c_usb_setup();
+	if (soc_is_rtl8196e())
+		rtl8196e_usb_setup();
 	else
 		BUG();
 }

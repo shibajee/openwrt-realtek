@@ -23,17 +23,17 @@
 static u32 tc_frequency;
 static u32 tc_data_shift;
 
-static __init void rtl8196c_tc1_init(void)
+static __init void rtl8196e_tc1_init(void)
 {
 	u32 tc1_data;
 	u32 val;
 
-	if (soc_is_rtl8196c_rev_a()) {
-		tc_data_shift = RTL8196C_TC_DATA_REVA_SHIFT;
-		tc1_data = RTL8196C_TC_DATA_REVA_MASK;
+	if (soc_is_rtl8196e()) {
+		tc_data_shift = RTL8196E_TC_DATA_SHIFT;
+		tc1_data = RTL8196E_TC_DATA_MASK;
 	} else {
-		tc_data_shift = RTL8196C_TC_DATA_REVB_SHIFT;
-		tc1_data = RTL8196C_TC_DATA_REVB_MASK;
+		tc_data_shift = RTL8196E_TC_DATA_SHIFT;
+		tc1_data = RTL8196E_TC_DATA_MASK;
 	}
 
 	__raw_writel(tc1_data << tc_data_shift, realtek_tc_base + REALTEK_TC_REG_DATA1);
@@ -52,8 +52,8 @@ static __init void rtl819x_tc1_init(void)
 {
 	tc_frequency = realtek_get_sys_clk_rate("timer");
 
-	if (soc_is_rtl8196c())
-		rtl8196c_tc1_init();
+	if (soc_is_rtl8196e())
+		rtl8196e_tc1_init();
 	else
 		BUG();
 }

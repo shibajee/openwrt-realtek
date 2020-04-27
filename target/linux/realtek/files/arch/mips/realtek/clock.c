@@ -39,15 +39,15 @@ static struct clk *__init realtek_add_sys_clkdev(
 	return clk;
 }
 
-#define RTL8196C_DEFAULT_BUS_CLOCK_RATE		200000000
+#define RTL8196E_DEFAULT_BUS_CLOCK_RATE		200000000
 
-static const u32 rtl8196c_cpu_clk[] =
+static const u32 rtl8196e_cpu_clk[] =
 	{250000000, 270000000, 290000000, 310000000, 330000000, 350000000, 370000000, 390000000};
 
-static const u32 rtl8196c_dram_clk[] =
+static const u32 rtl8196e_dram_clk[] =
 	{65625000, 78125000, 125000000, 150000000, 156250000, 168750000, 193750000, 200000000};
 
-static void __init rtl8196c_clocks_init(void)
+static void __init rtl8196e_clocks_init(void)
 {
 	unsigned long cpu_rate;
 	unsigned long dram_rate;
@@ -62,22 +62,22 @@ static void __init rtl8196c_clocks_init(void)
 
 	bs = realtek_sys_read(REALTEK_SYS_REG_BOOTSTRAP);
 
-	cpu_clk_sel = (bs >> RTL8196C_BOOTSTRAP_CPU_FREQ_SHIFT) & RTL8196C_BOOTSTRAP_CPU_FREQ_MASK;
-	cpu_clk_div_sel = bs & RTL8196C_BOOTSTRAP_CPU_FREQ_DIV;
-	sdr_clk_sel = (bs >> RTL8196C_BOOTSTRAP_SDRAM_CLK_SEL_SHIFT) & RTL8196C_BOOTSTRAP_SDRAM_CLK_SEL_MASK;
-	bus_clk_sel = bs & RTL8196C_BOOTSTRAP_CLKLX_FROM_CLKM;
+	cpu_clk_sel = (bs >> RTL8196E_BOOTSTRAP_CPU_FREQ_SHIFT) & RTL8196E_BOOTSTRAP_CPU_FREQ_MASK;
+	cpu_clk_div_sel = bs & RTL8196E_BOOTSTRAP_CPU_FREQ_DIV;
+	sdr_clk_sel = (bs >> RTL8196E_BOOTSTRAP_SDRAM_CLK_SEL_SHIFT) & RTL8196E_BOOTSTRAP_SDRAM_CLK_SEL_MASK;
+	bus_clk_sel = bs & RTL8196E_BOOTSTRAP_CLKLX_FROM_CLKM;
 
-	cpu_rate = rtl8196c_cpu_clk[cpu_clk_sel];
+	cpu_rate = rtl8196e_cpu_clk[cpu_clk_sel];
 
 	if (cpu_clk_div_sel)
 		cpu_rate /= 2;
 
-	dram_rate = rtl8196c_dram_clk[sdr_clk_sel];
+	dram_rate = rtl8196e_dram_clk[sdr_clk_sel];
 
 	if (bus_clk_sel)
 		bus_rate = dram_rate;
 	else
-		bus_rate = RTL8196C_DEFAULT_BUS_CLOCK_RATE;
+		bus_rate = RTL8196E_DEFAULT_BUS_CLOCK_RATE;
 
 	clks[0] = realtek_add_sys_clkdev("cpu", cpu_rate);
 	clks[1] = realtek_add_sys_clkdev("dram", dram_rate);
@@ -85,7 +85,7 @@ static void __init rtl8196c_clocks_init(void)
 
 	clk_add_alias("uart", NULL, "bus", NULL);
 
-	if (soc_is_rtl8196c_rev_a())
+	if (soc_is_rtl8196e())
 		timer_clk_div = 20;
 	else
 		timer_clk_div = 2;
@@ -101,8 +101,8 @@ static void __init rtl8196c_clocks_init(void)
 
 void __init realtek_clocks_init(void)
 {
-	if (soc_is_rtl8196c())
-		rtl8196c_clocks_init();
+	if (soc_is_rtl8196e())
+		rtl8196e_clocks_init();
 	else
 		BUG();
 }

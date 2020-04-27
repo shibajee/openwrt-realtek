@@ -160,7 +160,7 @@ void __init realtek_gpio_init(void)
 
 	spin_lock_init(&realtek_gpio_abcd.lock);
 
-	if (soc_is_rtl8196c())
+	if (soc_is_rtl8196e())
 		realtek_gpio_abcd.chip.ngpio = 17;
 	else
 		BUG();

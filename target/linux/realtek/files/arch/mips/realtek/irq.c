@@ -92,23 +92,23 @@ static struct irq_chip realtek_misc_irq_chip = {
 	.irq_ack	= realtek_soc_irq_ack,
 };
 
-static void __init rtl8196c_irq_init(void)
+static void __init rtl8196e_irq_init(void)
 {
-	mips_chip_bits = RTL8196C_INTCTL_IRQ_TC0 | RTL8196C_INTCTL_IRQ_USB |
-		RTL8196C_INTCTL_IRQ_PCIE | RTL8196C_INTCTL_IRQ_SWCORE;
+	mips_chip_bits = RTL8196E_INTCTL_IRQ_TC0 | RTL8196E_INTCTL_IRQ_USB |
+		RTL8196E_INTCTL_IRQ_PCIE | RTL8196E_INTCTL_IRQ_SWCORE;
 
 	__raw_writel(mips_chip_bits, realtek_intctl_base + REALTEK_INTCTL_REG_MASK);
 
-	__raw_writel(2 << RTL8196C_INTCTL_IRR0_UART_SHIFT,
+	__raw_writel(2 << RTL8196E_INTCTL_IRR0_UART_SHIFT,
 		realtek_intctl_base + REALTEK_INTCTL_REG_IRR0);
 		
-	__raw_writel((7 << RTL8196C_INTCTL_IRR1_TC0_SHIFT) |
-		(2 << RTL8196C_INTCTL_IRR1_GPIO_SHIFT) |
-		(6 << RTL8196C_INTCTL_IRR1_SWCORE_SHIFT) |
-		(5 << RTL8196C_INTCTL_IRR1_PCIE_SHIFT),
+	__raw_writel((7 << RTL8196E_INTCTL_IRR1_TC0_SHIFT) |
+		(2 << RTL8196E_INTCTL_IRR1_GPIO_SHIFT) |
+		(6 << RTL8196E_INTCTL_IRR1_SWCORE_SHIFT) |
+		(5 << RTL8196E_INTCTL_IRR1_PCIE_SHIFT),
 		realtek_intctl_base + REALTEK_INTCTL_REG_IRR1);
 
-	__raw_writel(4 << RTL8196C_INTCTL_IRR2_USB_HOST_SHIFT,
+	__raw_writel(4 << RTL8196E_INTCTL_IRR2_USB_HOST_SHIFT,
 		realtek_intctl_base + REALTEK_INTCTL_REG_IRR2);
 }
 
@@ -120,8 +120,8 @@ static void __init realtek_soc_irq_init(void)
 
 	__raw_writel(0, realtek_intctl_base + REALTEK_INTCTL_REG_MASK);
 	
-	if (soc_is_rtl8196c())
-		rtl8196c_irq_init();
+	if (soc_is_rtl8196e())
+		rtl8196e_irq_init();
 
 	for (i = REALTEK_SOC_IRQ_BASE;
 	     i < REALTEK_SOC_IRQ_BASE + REALTEK_SOC_IRQ_COUNT; i++) {

@@ -84,7 +84,7 @@ void __init realtek_register_uart(void)
 
 	uart_clk_rate = realtek_get_sys_clk_rate("uart");
 
-	if (soc_is_rtl8196c()) {
+	if (soc_is_rtl8196e()) {
 		realtek_uart0_data[0].irq = REALTEK_SOC_IRQ(7);
 		realtek_uart0_data[0].uartclk = uart_clk_rate;
 		platform_device_register(&ath79_uart0_device);

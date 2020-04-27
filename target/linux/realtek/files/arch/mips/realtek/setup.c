@@ -63,14 +63,9 @@ static void __init realtek_detect_soc_type(void)
 	chiprev = realtek_sys_read(REALTEK_SYS_REG_REVISION);
 
 	switch (chiprev) {
-	case SOC_ID_RTL8196C_REV_A:
-		rtl_soc = RTL_SOC_8196C_REV_A;
-		chip = "8196C rev A";
-		break;
-
-	case SOC_ID_RTL8196C_REV_B:
-		rtl_soc = RTL_SOC_8196C_REV_B;
-		chip = "8196C rev B";
+	case SOC_ID_RTL8196E:
+		rtl_soc = RTL_SOC_8196E;
+		chip = "8196E";
 		break;
 
 	default:

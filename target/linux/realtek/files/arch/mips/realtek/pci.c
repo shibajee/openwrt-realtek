@@ -104,13 +104,13 @@ static void __init realtek_pcie_phy_reset(struct realtek_pcie_reset_controller *
 	__raw_writel(REALTEK_PCIE_RC_EXT_PWR_PHY_SRST_L | REALTEK_PCIE_RC_EXT_PWR_APP_LTSSM_EN, rprc->rc_ext_base + REALTEK_PCIE_RC_EXT_REG_PWR_CR);
 }
 
-static void __init rtl8196c_pcie_reset(struct realtek_pcie_reset_controller *rprc, int pcie_xtal_40mhz)
+static void __init rtl8196e_pcie_reset(struct realtek_pcie_reset_controller *rprc, int pcie_xtal_40mhz)
 {
 	u32 val;
 
 	/* Enable PCIe controller */
 	val = realtek_sys_read(REALTEK_SYS_REG_CLK_MANAGE);
-	val |= RTL8196C_SYS_CLK_PCIE0_EN;
+	val |= RTL8196E_SYS_CLK_PCIE0_EN;
 	realtek_sys_write(REALTEK_SYS_REG_CLK_MANAGE, val);
 
 #if 0
@@ -144,11 +144,11 @@ static void __init rtl8196c_pcie_reset(struct realtek_pcie_reset_controller *rpr
 
 	/* Reset PCIe device */
 	val = realtek_sys_read(REALTEK_SYS_REG_CLK_MANAGE);
-	val &= ~RTL8196C_SYS_CLK_PCIE0_DEV_RST_L;
+	val &= ~RTL8196E_SYS_CLK_PCIE0_DEV_RST_L;
 	realtek_sys_write(REALTEK_SYS_REG_CLK_MANAGE, val);
 	mdelay(1);
 
-	val |= RTL8196C_SYS_CLK_PCIE0_DEV_RST_L;
+	val |= RTL8196E_SYS_CLK_PCIE0_DEV_RST_L;
 	realtek_sys_write(REALTEK_SYS_REG_CLK_MANAGE, val);
 	mdelay(1);
 
@@ -159,7 +159,7 @@ int pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 {
 	switch (dev->bus->number) {
 	case 0:
-		if (soc_is_rtl8196c())
+		if (soc_is_rtl8196e())
 			return REALTEK_SOC_IRQ(5);
 		break;
 	}
@@ -204,8 +204,8 @@ void __init realtek_register_pci(void)
 	rprc1.rc_ext_base = ioremap_nocache(REALTEK_PCIE1_RC_EXT_BASE, REALTEK_PCIE1_RC_EXT_SIZE);
 	rprc1.rc_phy_reg = REALTEK_SYS_REG_PCIE1_PHY;
 
-	if (soc_is_rtl8196c()) {
-		rtl8196c_pcie_reset(&rprc0, 1);
+	if (soc_is_rtl8196e()) {
+		rtl8196e_pcie_reset(&rprc0, 1);
 		__realtek_pci_register(0);
 	} else
 		BUG();
